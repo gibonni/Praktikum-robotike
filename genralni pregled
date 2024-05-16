@@ -1,0 +1,19 @@
+Sto treba napraviti:
+direktna kinematika{
+preko skripte zadavati kuteve
+napraviti matricu za kinematiku - youtube, prezentacije s predavanja
+}
+inverzna kinematika{
+isto odrediti matricu (4x4 matrica)
+daje kuteve u kojima zgblob treba biti da bi bio u zadanoj točki
+?
+}
+GUI{
+sve --> treba pogledati ograničenja i kuteve te zabraniti prijelaze
+dio za olovku --> toggle(dva stanja piše i ne piše)
+ostalo --> jos cemo vidjet
+}
+RACUNALNI VID{
+mozda napraviti varijable na koje zapisujemo varijable i stavlja ih na workspace
+prati poziciju olovke i racuna putanju
+}
