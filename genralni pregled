@@ -1,19 +1,37 @@
-Sto treba napraviti:
-direktna kinematika{
-preko skripte zadavati kuteve
-napraviti matricu za kinematiku - youtube, prezentacije s predavanja
+UKUPNO: 100 bod
+
+
+Fizicki robot{ (ukupno 10 bod)
+    RRR konfiguracija s oloovkom nekako prikvacenom na robota. (10 bod)
 }
-inverzna kinematika{
-isto odrediti matricu (4x4 matrica)
-daje kuteve u kojima zgblob treba biti da bi bio u zadanoj točki
-?
+
+Mehanicki dizajn{ (15 bod)
+    Ocjenjuje se dizajn, tezina, funkcionalnost. (15 bod)
 }
-GUI{
-sve --> treba pogledati ograničenja i kuteve te zabraniti prijelaze
-dio za olovku --> toggle(dva stanja piše i ne piše)
-ostalo --> jos cemo vidjet
+
+Direktna kinematika{ (ukupno 5 bod)
+    Algoritam (5 bod)
+    preko skripte zadavati kuteve
+    napraviti matricu za kinematiku - youtube, prezentacije s predavanja
 }
-RACUNALNI VID{
-mozda napraviti varijable na koje zapisujemo varijable i stavlja ih na workspace
-prati poziciju olovke i racuna putanju
+Inverzna kinematika{ (ukupno 5 bod)
+    Algoritam (5 bod)
+    isto odrediti matricu (4x4 matrica)
+    daje kuteve u kojima zgblob treba biti da bi bio u zadanoj točki
+    ?
+}
+GUI{ (ukupno 20 bod)
+    Kretanje zglobova: Manual mod direktno/inverzno.
+        --> dizajn intuitivnost ... (10 bod)
+        --> direktna kinematika mora imati slidere i kucice za upis pozicija (Na to staviti ogranicenja)(5 bod)
+        --> inverzna kinematika daje upis kordinate te pomak na zadanu kordinatu (5 bod)
+            -(Ogranicenja radnog prostora, uvjek mora prikazivati trenutnu poziciju svih zglobova)
+    Prebacivanje u Auto mode, prima ulazne mete i zabrane te kreira put.
+}
+RACUNALNI VID{ (Ukupno 45 bod)
+    Kalibracija frame kamere i baze robota (5 bod)
+    Prepoznavanje i lokaliziranje objekata (5 bod)
+    Ucitavanje podataka, planiranje puta markera, izvrsavanje puta (15 bod)
+    Vremenski izazov (20 bod)
+        --> Ocijenjuje se brzina, kvaliteta linije, negativno za prijelaz preko zabrana.
 }
