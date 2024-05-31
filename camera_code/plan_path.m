@@ -1,0 +1,1 @@
+%% planiranje puta izmedu meta
