@@ -1,9 +1,6 @@
 %% dobivanje slika
 camera_info = imaqhwinfo('winvideo');
-device_id=camera_info.DeviceIDs{2};
-defaultFormat = camera_info.DeviceInfo(2).DefaultFormat;
-video_obj = videoinput('winvideo', device_id, defaultFormat);
-
+video_obj = videoinput('winvideo', camera_info.DeviceIDs{1}, camera_info.DeviceIDs{});
 
 folder = 'calibration_images'; % Folder za slike
 if ~exist(folder, 'dir')

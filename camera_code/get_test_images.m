@@ -1,6 +1,8 @@
 %% dobivanje slika
 camera_info = imaqhwinfo('winvideo');
-video_obj = videoinput('winvideo', camera_info.DeviceInfo.DeviceID, camera_info.DeviceInfo.DefaultFormat);
+device_id=camera_info.DeviceIDs{2};
+defaultFormat = camera_info.DeviceInfo(2).DefaultFormat;
+video_obj = videoinput('winvideo', device_id, defaultFormat);
 
 folder = 'test_images'; % Folder za slike
 if ~exist(folder, 'dir')
