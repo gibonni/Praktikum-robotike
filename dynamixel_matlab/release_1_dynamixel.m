@@ -1,0 +1,1 @@
+run dynamixel/release_1_dynamixel_script.m
