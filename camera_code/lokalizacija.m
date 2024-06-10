@@ -44,15 +44,15 @@ squareSize = 18.5; % squer size on patern
 checkerboard_points = generateCheckerboardPoints(boardSize, squareSize); 
 checkerboard_points_h = [checkerboard_points zeros(size(checkerboard_points,1),1) ones(size(checkerboard_points,1),1)];
 % measure the pose of the pattern in the frame {R} % nedes to be calculated
-T_cam_robot = [1 0 0 -43;
-     0 -1 0 103.5;
-     0 0 -1 0;
-     0 0 0 1];
-worldPoints = transpose(T_cam_robot*transpose(checkerboard_points_h));
+T = [0 1 0 131;
+     1 0 0 -195;
+     0 0 1 560;
+      0 0 0 1];
+worldPoints = transpose(T*transpose(checkerboard_points_h));
 worldPoints = worldPoints(:,1:2);
 [R, t] = extrinsics(imagePoints, worldPoints, cameraParams);
 [camera_orientation, camera_location] = extrinsicsToCameraPose(R, t); %camera orijentation and location in respect to robot
-
+camera_location % 170, -23
 T_robot_cam = [camera_orientation, camera_location'; 0 0 0 1];
 T_cam_robot = inv(T_robot_cam); % transformacija iz kamere u prostor robota
 
@@ -70,18 +70,14 @@ props = regionprops(cc, 'Area');
 [~, idx] = max([props.Area]);
 red_dot_largest = zeros(size(red_dot));
 red_dot_largest(cc.PixelIdxList{idx}) = 1;
-%imshow(red_dot_largest); %detected dot
+imshow(red_dot_largest); %detected dot
+%%
 props_largest = regionprops(red_dot_largest, 'Centroid');
-centroid = props_largest.Centroid;
+centroid = cat(1, props_largest.Centroid);
 
 %Geting position in robot frame of reds dot centroid
-x_dot = centroid(1);
-y_dot = centroid(2);
-normalized_cam_cord = inv(intrinsicMatrix) * [x_dot; y_dot; 1];
-% Ensure normalized_cam_cord is a column vector
-if size(normalized_cam_cord, 2) > 1
-    normalized_cam_cord = normalized_cam_cord';
-end
-normalized_cam_cord = [normalized_cam_cord; 1];
-dot_cords = T_robot_cam * normalized_cam_cord;
-dot_cords
+z_pattern = camera_location(:,3) 
+u = centroid(:,1);
+v = centroid(:,2);
+%normalized_cam_cord = intrinsicMatrix\[x_dot; y_dot; 1];
+pointsToWorld(cameraParams.Intrinsics, R, t, [u v])
