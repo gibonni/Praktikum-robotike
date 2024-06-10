@@ -73,6 +73,7 @@ red_dot_largest(cc.PixelIdxList{idx}) = 1;
 %imshow(red_dot_largest); %detected dot
 props_largest = regionprops(red_dot_largest, 'Centroid');
 centroid = props_largest.Centroid;
+
 %Geting position in robot frame of reds dot centroid
 x_dot = centroid(1);
 y_dot = centroid(2);
