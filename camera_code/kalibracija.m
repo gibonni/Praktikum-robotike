@@ -15,7 +15,7 @@ f = figure('Visible', 'off');
 vidRes = video_obj.VideoResolution;
 imageRes = fliplr(vidRes);
 hImage = imshow(zeros(imageRes));
-num_images = 15;
+num_images = 10;
 for i=1:num_images
     % preview video object
     preview(video_obj, hImage);
@@ -34,11 +34,17 @@ clear video_obj
 % nakon ovog napraviti kalibraciju u Camera Calibrator App-u
 
 %% pohrana dobivenih parametara u file
+camera_params=cameraParams;
 intrinsicMatrix = cameraParams.Intrinsics.IntrinsicMatrix;
 filename = 'intrinsic_matrix.mat';
 save(filename, 'intrinsicMatrix');
+filename = 'camera_params.mat';
+save(filename, 'camera_params');
 
 %% ucitavanje parametara iz file-a
 filename = 'intrinsic_matrix.mat';
 loadedData = load(filename);
 intrinsicMatrix = loadedData.intrinsicMatrix;
+filename = 'camera_params.mat';
+loadedData = load(filename);
+cameraParams = loadedData.camera_params;
