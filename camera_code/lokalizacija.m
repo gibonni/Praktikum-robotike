@@ -36,29 +36,38 @@ stop(video_obj);
 
 %% odredivanje prostora kamere
 imageFilePath = 'calib_bot/calib_bot0.png';
+intrinsics = cameraParams.Intrinsics;
 % Load the image into a variable
 calib_img = imread(imageFilePath);
-[img_undist,newOrigin] = undistortImage(calib_img,cameraParams,'OutputView','full'); %undestort image
+[img_undist,newIntrinsics] = undistortImage(calib_img,cameraParams,'OutputView','full'); %undestort image
+%imshow(img_undist);
 [imagePoints,boardSize] = detectCheckerboardPoints(img_undist); %get points of patern
+newOrigin = intrinsics.PrincipalPoint - newIntrinsics.PrincipalPoint; % compensate for shift from undistort
+imagePoints = imagePoints+newOrigin;
 squareSize = 18.5; % squer size on patern
 checkerboard_points = generateCheckerboardPoints(boardSize, squareSize); 
+checkerboard_points
 checkerboard_points_h = [checkerboard_points zeros(size(checkerboard_points,1),1) ones(size(checkerboard_points,1),1)];
 % measure the pose of the pattern in the frame {R} % nedes to be calculated
 T = [0 1 0 131;
      1 0 0 -195;
-     0 0 1 560;
+     0 0 -1 0;
       0 0 0 1];
 worldPoints = transpose(T*transpose(checkerboard_points_h));
 worldPoints = worldPoints(:,1:2);
-[R, t] = extrinsics(imagePoints, worldPoints, cameraParams);
-[camera_orientation, camera_location] = extrinsicsToCameraPose(R, t); %camera orijentation and location in respect to robot
-camera_location % 170, -23
-T_robot_cam = [camera_orientation, camera_location'; 0 0 0 1];
-T_cam_robot = inv(T_robot_cam); % transformacija iz kamere u prostor robota
+camExtrinsics = estimateExtrinsics(imagePoints, worldPoints, newIntrinsics);
+camPose = extr2pose(camExtrinsics);
+figure
+plotCamera(AbsolutePose=camPose,Size=20);
+hold on
+pcshow([worldPoints,zeros(size(worldPoints,1),1)], ...
+VerticalAxisDir="down",MarkerSize=40);
+camPose% 170, -23
 
 %% Example of getting cordinate from detected object in camera to Robots cordinates
 %red dot position in robat cords
 detect_example=imread('calib_bot\calib_bot0.png');
+[detect_example,newOrigin] = undistortImage(detect_example,cameraParams,'OutputView','full'); %undestort image
 red_channel = detect_example(:,:,1); % Red channel
 green_channel = detect_example(:,:,2); % Green channel
 blue_channel = detect_example(:,:,3); % Blue channel
