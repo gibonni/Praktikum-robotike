@@ -3,14 +3,6 @@ camera_info = imaqhwinfo('winvideo');
 device_id=camera_info.DeviceIDs{2};
 defaultFormat = camera_info.DeviceInfo(2).DefaultFormat;
 video_obj = videoinput('winvideo', device_id, defaultFormat);
-%% ucitavanje parametara iz file-a
-filename = 'intrinsic_matrix.mat';
-loadedData = load(filename);
-intrinsicMatrix = loadedData.intrinsicMatrix;
-filename = 'camera_params.mat';
-loadedData = load(filename);
-cameraParams = loadedData.camera_params;
-
 %% dobivanje jedne slike
 folder = 'calib_bot'; % Folder za slike
 if ~exist(folder, 'dir')
@@ -36,37 +28,13 @@ stop(video_obj);
 
 %% odredivanje prostora kamere
 imageFilePath = 'calib_bot/calib_bot0.png';
-intrinsics = cameraParams.Intrinsics;
 % Load the image into a variable
 calib_img = imread(imageFilePath);
-[img_undist,newIntrinsics] = undistortImage(calib_img,cameraParams,'OutputView','full'); %undestort image
-%imshow(img_undist);
-[imagePoints,boardSize] = detectCheckerboardPoints(img_undist); %get points of patern
-newOrigin = intrinsics.PrincipalPoint - newIntrinsics.PrincipalPoint; % compensate for shift from undistort
-imagePoints = imagePoints+newOrigin;
-squareSize = 18.5; % squer size on patern
-checkerboard_points = generateCheckerboardPoints(boardSize, squareSize); 
-checkerboard_points
-checkerboard_points_h = [checkerboard_points zeros(size(checkerboard_points,1),1) ones(size(checkerboard_points,1),1)];
-% measure the pose of the pattern in the frame {R} % nedes to be calculated
-T = [0 1 0 131;
-     1 0 0 -195;
-     0 0 -1 0;
-      0 0 0 1];
-worldPoints = transpose(T*transpose(checkerboard_points_h));
-worldPoints = worldPoints(:,1:2);
-camExtrinsics = estimateExtrinsics(imagePoints, worldPoints, newIntrinsics);
-camPose = extr2pose(camExtrinsics);
-figure
-plotCamera(AbsolutePose=camPose,Size=20);
-hold on
-pcshow([worldPoints,zeros(size(worldPoints,1),1)], ...
-VerticalAxisDir="down",MarkerSize=40);
-camPose% 170, -23
-
+[R_cam, t_cam,camPose,cameraParams]=calib_robot(calib_img);
 %% Example of getting cordinate from detected object in camera to Robots cordinates
 %red dot position in robat cords
-detect_example=imread('calib_bot\calib_bot0.png');
+%detect_example=imread('calib_bot\calib_bot0.png');
+detect_example=imread('calibration_images\calib_img3.png');
 [detect_example,newOrigin] = undistortImage(detect_example,cameraParams,'OutputView','full'); %undestort image
 red_channel = detect_example(:,:,1); % Red channel
 green_channel = detect_example(:,:,2); % Green channel
@@ -80,13 +48,11 @@ props = regionprops(cc, 'Area');
 red_dot_largest = zeros(size(red_dot));
 red_dot_largest(cc.PixelIdxList{idx}) = 1;
 imshow(red_dot_largest); %detected dot
-%%
 props_largest = regionprops(red_dot_largest, 'Centroid');
 centroid = cat(1, props_largest.Centroid);
-
-%Geting position in robot frame of reds dot centroid
-z_pattern = camera_location(:,3) 
+%% Geting position in robot frame of reds dot centroid
 u = centroid(:,1);
 v = centroid(:,2);
-%normalized_cam_cord = intrinsicMatrix\[x_dot; y_dot; 1];
-pointsToWorld(cameraParams.Intrinsics, R, t, [u v])
+[x,y]=localise(u, v, R_cam, t_cam);
+x
+y
