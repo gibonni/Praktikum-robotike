@@ -1,0 +1,63 @@
+function [R_cam, t_cam, camPose] = calib_robot()
+    %% postavljanje parametara kamere
+    camera_info = imaqhwinfo('winvideo');
+    device_id=camera_info.DeviceIDs{2};
+    defaultFormat = camera_info.DeviceInfo(2).DefaultFormat;
+    video_obj = videoinput('winvideo', device_id, defaultFormat);
+    %% ucitavanje parametara iz file-a
+    filename = 'intrinsic_matrix.mat';
+    loadedData = load(filename);
+    intrinsicMatrix = loadedData.intrinsicMatrix;
+    filename = 'camera_params.mat';
+    loadedData = load(filename);
+    cameraParams = loadedData.camera_params;
+    
+    %% dobivanje jedne slike
+    folder = 'calib_bot'; % Folder za slike
+    if ~exist(folder, 'dir')
+       mkdir(folder); 
+    end
+    
+    video_obj.ReturnedColorSpace = 'rgb';
+    f = figure('Visible', 'off'); 
+    vidRes = video_obj.VideoResolution;
+    imageRes = fliplr(vidRes);
+    hImage = imshow(zeros(imageRes));
+    
+    preview(video_obj, hImage);
+    waitforbuttonpress;
+    stoppreview(video_obj);
+    
+    start(video_obj);
+    img = getdata(video_obj);
+    img = img(:, :, (1:3));
+    filename = fullfile(folder, strcat('calib_bot', num2str(0), '.png'));
+    imwrite(img, filename)
+    stop(video_obj);
+    
+    %% odredivanje prostora kamere
+    imageFilePath = 'calib_bot/calib_bot0.png';
+    intrinsics = cameraParams.Intrinsics;
+    % Load the image into a variable
+    calib_img = imread(imageFilePath);
+    [img_undist,newIntrinsics] = undistortImage(calib_img,cameraParams,'OutputView','full'); %undestort image
+    %imshow(img_undist);
+    [imagePoints,boardSize] = detectCheckerboardPoints(img_undist); %get points of patern
+    newOrigin = intrinsics.PrincipalPoint - newIntrinsics.PrincipalPoint; % compensate for shift from undistort
+    imagePoints = imagePoints+newOrigin;
+    squareSize = 18.5; % squer size on patern
+    checkerboard_points = generateCheckerboardPoints(boardSize, squareSize); 
+    checkerboard_points
+    checkerboard_points_h = [checkerboard_points zeros(size(checkerboard_points,1),1) ones(size(checkerboard_points,1),1)];
+    % measure the pose of the pattern in the frame {R} % nedes to be calculated
+    T = [0 -1 0 17;
+         -1 0 0 306;
+         0 0 1 0;
+         0 0 0 1];
+    worldPoints = transpose(T*transpose(checkerboard_points_h));
+    worldPoints = worldPoints(:,1:2);
+    camExtrinsics = estimateExtrinsics(imagePoints, worldPoints, newIntrinsics);
+    camPose = extr2pose(camExtrinsics);
+    t_cam = camPose.Translation% 170, -23
+    R_cam = camPose.Rotation
+end
