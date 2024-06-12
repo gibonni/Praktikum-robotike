@@ -4,12 +4,12 @@ device_id=camera_info.DeviceIDs{2};
 defaultFormat = camera_info.DeviceInfo(2).DefaultFormat;
 video_obj = videoinput('winvideo', device_id, defaultFormat);
 
-
+%%
 folder = 'calibration_images'; % Folder za slike
 if ~exist(folder, 'dir')
    mkdir(folder); 
 end
-
+%%
 video_obj.ReturnedColorSpace = 'rgb';
 f = figure('Visible', 'off'); 
 vidRes = video_obj.VideoResolution;

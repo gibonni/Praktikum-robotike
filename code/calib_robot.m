@@ -1,8 +1,12 @@
-function [R_cam, t_cam, camPose, cameraParams] = calib_robot(calib_img)
+function [R_cam, t_cam, camPose, cameraParams] = calib_robot()
     %% ucitavanje parametara iz file-a
     filename = 'camera_params.mat';
     loadedData = load(filename);
     cameraParams = loadedData.camera_params;
+
+    imageFilePath = 'calib_bot/calib_bot0.png';
+    % Load the image into a variable
+    calib_img = imread(imageFilePath);
     
     %% odredivanje prostora kamere
     intrinsics = cameraParams.Intrinsics;
